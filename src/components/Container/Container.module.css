@@ -1,0 +1,24 @@
+.Container {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@media screen and (min-width: 480px) {
+  .Container {
+    width: 480px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .Container {
+    width: 768px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .Container {
+    width: 1200px;
+  }
+}
