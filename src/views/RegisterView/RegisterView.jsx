@@ -1,25 +1,54 @@
-import { connect } from 'react-redux';
+import { useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
-import useInput from '../../hooks';
-import { authOperations } from '../../redux/auth';
+import { authOperations } from 'redux/auth';
 
 import st from './RegisterView.module.css';
 
-const RegisterView = ({ onRegister }) => {
-  const name = useInput('');
-  const email = useInput('');
-  const password = useInput('');
+const RegisterView = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    const user = {
-      name: name.value,
-      email: email.value,
-      password: password.value,
-    };
+  const dispatch = useDispatch();
 
-    onRegister(user);
-  };
+  const handChange = useCallback(({ target: { name, value } }) => {
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+
+      case 'email':
+        setEmail(value);
+        break;
+
+      case 'password':
+        setPassword(value);
+        break;
+
+      default:
+        console.warn(`the field type ${name} is not supported`);
+    }
+  }, []);
+
+  const handleSubmit = useCallback(
+    e => {
+      e.preventDefault();
+
+      const user = {
+        name,
+        email,
+        password,
+      };
+
+      dispatch(authOperations.register(user));
+
+      setName('');
+      setEmail('');
+      setPassword('');
+    },
+    [name, email, password, dispatch],
+  );
 
   return (
     <div>
@@ -31,9 +60,10 @@ const RegisterView = ({ onRegister }) => {
           <input
             className={st.formInput}
             type="text"
-            value={name.value}
+            name="name"
+            value={name}
             required
-            onChange={name.onChange}
+            onChange={handChange}
           />
         </label>
 
@@ -42,9 +72,10 @@ const RegisterView = ({ onRegister }) => {
           <input
             className={st.formInput}
             type="email"
-            value={email.value}
+            name="email"
+            value={email}
             required
-            onChange={email.onChange}
+            onChange={handChange}
           />
         </label>
 
@@ -53,9 +84,10 @@ const RegisterView = ({ onRegister }) => {
           <input
             className={st.formInput}
             type="password"
-            value={password.value}
+            name="password"
+            value={password}
             required
-            onChange={password.onChange}
+            onChange={handChange}
           />
         </label>
 
@@ -67,10 +99,4 @@ const RegisterView = ({ onRegister }) => {
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  onRegister: data => {
-    return dispatch(authOperations.register(data));
-  },
-});
-
-export default connect(null, mapDispatchToProps)(RegisterView);
+export default RegisterView;

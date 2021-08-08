@@ -1,4 +1,4 @@
-import PhoneIcon from '../../icons/phone.svg';
+import PhoneIcon from 'icons/phone.svg';
 import st from './HomeView.module.css';
 
 function HomeView() {
@@ -6,7 +6,7 @@ function HomeView() {
     <div className={st.wrapper}>
       <h1>Phonebook App</h1>
 
-      <img src={PhoneIcon} alt="" />
+      <img src={PhoneIcon} alt="PhoneIcon" />
     </div>
   );
 }

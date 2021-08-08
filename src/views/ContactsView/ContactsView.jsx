@@ -1,18 +1,23 @@
-import { connect } from 'react-redux';
 import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Loader from 'react-loader-spinner';
 
-import { contactsSelectors, contactsOperations } from '../../redux/contacts';
+import { contactsSelectors, contactsOperations } from 'redux/contacts';
 
-import ContactForm from '../../components/ContactForm';
-import Filter from '../../components/Filter';
-import ContactsList from '../../components/ContactList';
+import ContactForm from 'components/ContactForm';
+import Filter from 'components/Filter';
+import ContactsList from 'components/ContactList';
 
-const ContactsView = ({ fetchContacts, isLoading }) => {
+import st from './ContactsView.module.css';
+
+const ContactsView = () => {
+  const isLoading = useSelector(contactsSelectors.getLoading);
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
+    dispatch(contactsOperations.fetchContacts());
+  }, [dispatch]);
 
   return (
     <>
@@ -24,18 +29,12 @@ const ContactsView = ({ fetchContacts, isLoading }) => {
       <ContactsList />
 
       {isLoading && (
-        <Loader type="Puff" color="#00BFFF" height={80} width={80} />
+        <div className={st.loader}>
+          <Loader type="ThreeDots" color="#00BFFF" width={150} height={100} />
+        </div>
       )}
     </>
   );
 };
 
-const mapStateToProps = state => ({
-  isLoading: contactsSelectors.getLoading(state),
-});
-
-const mapDispatchToProps = dispatch => ({
-  fetchContacts: () => dispatch(contactsOperations.fetchContacts()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactsView);
+export default ContactsView;

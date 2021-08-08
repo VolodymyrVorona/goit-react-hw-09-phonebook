@@ -1,23 +1,43 @@
-import { connect } from 'react-redux';
+import { useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
-import useInput from '../../hooks';
-import { authOperations } from '../../redux/auth';
+import { authOperations } from 'redux/auth';
 
 import st from './LoginView.module.css';
 
-const LoginView = ({ onLogin }) => {
-  const email = useInput('');
-  const password = useInput('');
+const LoginView = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const dispatch = useDispatch();
+
+  const handleChange = useCallback(({ target: { name, value } }) => {
+    switch (name) {
+      case 'email':
+        setEmail(value);
+        break;
+
+      case 'password':
+        setPassword(value);
+        break;
+
+      default:
+        console.warn(`the field type ${name} is not supported`);
+    }
+  }, []);
 
   const handleSubmit = e => {
     e.preventDefault();
 
-    let user = {
-      email: email.value,
-      password: password.value,
+    const user = {
+      email,
+      password,
     };
 
-    onLogin(user);
+    dispatch(authOperations.logIn(user));
+
+    setEmail('');
+    setPassword('');
   };
 
   return (
@@ -30,10 +50,11 @@ const LoginView = ({ onLogin }) => {
           <input
             className={st.formInput}
             type="email"
-            value={email.value}
+            name="email"
+            value={email}
             required
             placeholder="peter.parker@gmail.com"
-            onChange={email.onChange}
+            onChange={handleChange}
           />
         </label>
         <label className={st.formField}>
@@ -41,9 +62,10 @@ const LoginView = ({ onLogin }) => {
           <input
             className={st.formInput}
             type="password"
-            value={password.value}
+            name="password"
+            value={password}
             required
-            onChange={password.onChange}
+            onChange={handleChange}
           />
         </label>
 
@@ -55,12 +77,4 @@ const LoginView = ({ onLogin }) => {
   );
 };
 
-const mdtp = {
-  onLogin: authOperations.logIn,
-};
-
-// const mapDispatchToProps = dispatch => ({
-//   onLogin: data => dispatch(authOperations.logIn(data)),
-// });
-
-export default connect(null, mdtp)(LoginView);
+export default LoginView;

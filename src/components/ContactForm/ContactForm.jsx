@@ -1,83 +1,86 @@
-import { Component } from 'react';
-import { connect } from 'react-redux';
-import { contactsOperations, contactsSelectors } from '../../redux/contacts';
+import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { contactsOperations, contactsSelectors } from 'redux/contacts';
 
 import st from './ContactForm.module.css';
 
-class Form extends Component {
-  state = { name: '', number: '' };
+function Form() {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  handleInputChange = e => {
+  const contacts = useSelector(contactsSelectors.getAllContacts);
+  const dispatch = useDispatch();
+
+  const handleInputChange = e => {
     const { name, value } = e.currentTarget;
-    this.setState({ [name]: value });
+
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+
+      case 'number':
+        setNumber(value);
+
+      // eslint-disable-next-line no-fallthrough
+      default:
+        return;
+    }
   };
 
-  findTheSameName = newName => {
-    const { contacts } = this.props;
+  const findTheSameName = newName => {
     const normalizedName = newName.toLowerCase();
 
     return contacts.find(({ name }) => name.toLowerCase() === normalizedName);
   };
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    const { name } = this.state;
 
-    if (this.findTheSameName(name)) {
+    if (findTheSameName(name)) {
       return alert(`${name} is already in contacts`);
     }
 
-    this.props.onSubmit(this.state);
+    dispatch(contactsOperations.addContact({ name, number }));
 
-    this.setState({ name: '', number: '' });
+    setName('');
+    setNumber('');
   };
 
-  render() {
-    const { name, number } = this.state;
+  return (
+    <form className={st.form} onSubmit={handleSubmit}>
+      <label className={st.label}>
+        Name
+        <input
+          className={st.input}
+          type="text"
+          name="name"
+          value={name}
+          onChange={handleInputChange}
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
+          required
+        />
+      </label>
+      <label className={st.label}>
+        Number
+        <input
+          className={st.input}
+          type="tel"
+          name="number"
+          value={number}
+          onChange={handleInputChange}
+          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+          title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
+          required
+        />
+      </label>
 
-    return (
-      <form className={st.form} onSubmit={this.handleSubmit}>
-        <label className={st.label}>
-          Name
-          <input
-            className={st.input}
-            type="text"
-            name="name"
-            value={name}
-            onChange={this.handleInputChange}
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
-            required
-          />
-        </label>
-        <label className={st.label}>
-          Number
-          <input
-            className={st.input}
-            type="tel"
-            name="number"
-            value={number}
-            onChange={this.handleInputChange}
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
-            required
-          />
-        </label>
-
-        <button className={st.btn} type="submit">
-          Add contact
-        </button>
-      </form>
-    );
-  }
+      <button className={st.btn} type="submit">
+        Add contact
+      </button>
+    </form>
+  );
 }
 
-const mapStateToProps = state => ({
-  contacts: contactsSelectors.getAllContacts(state),
-});
-
-const mapDispatchToProps = dispatch => ({
-  onSubmit: contact => dispatch(contactsOperations.addContact(contact)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Form);
+export default Form;

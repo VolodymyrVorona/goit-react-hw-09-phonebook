@@ -1,16 +1,15 @@
-// import { useEffect } from 'react';
 import { useEffect, Suspense, lazy } from 'react';
 import { Switch } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { authOperations } from './redux/auth';
+import { authOperations } from 'redux/auth';
 
-import Container from './components/Container';
-import AppBar from './components/AppBar';
-import PrivateRoute from './components/PrivateRoute';
-import PublicRoute from './components/PublicRoute';
+import Container from 'components/Container';
+import AppBar from 'components/AppBar';
+import PrivateRoute from 'components/PrivateRoute';
+import PublicRoute from 'components/PublicRoute';
 
-import route from './route';
+import route from 'route';
 
 const HomeView = lazy(() =>
   import('./views/HomeView' /* webpackChunkName: "home-page" */),
